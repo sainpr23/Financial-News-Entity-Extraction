@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Financial News Entity Extraction</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-nav">
+        <div class="brand">
+          <div class="brand-mark">FN</div>
+          <div class="brand-text">
+            <span class="brand-title">Financial News Entity Extraction</span>
+            <span class="brand-subtitle">Entity extraction dashboard</span>
+          </div>
+        </div>
+        <div class="nav-right">
+          <nav class="nav-links" aria-label="Primary">
+            <a href="#analyzer" class="nav-link nav-link-active">Analyzer</a>
+            <a href="#results" class="nav-link">Results</a>
+            <a href="#about" class="nav-link">About</a>
+          </nav>
+
+          {% if user %}
+          <div class="profile-menu" id="profile-menu">
+            <button type="button" class="profile-trigger" aria-haspopup="true" aria-expanded="false">
+              <span class="profile-avatar">{{ user[0]|upper }}</span>
+              <span class="profile-name">{{ user }}</span>
+              <span class="profile-caret">▾</span>
+            </button>
+            <div class="profile-dropdown" id="profile-dropdown" role="menu">
+              <a href="{{ url_for('settings') }}" role="menuitem">Settings</a>
+              <a href="{{ url_for('logout') }}" role="menuitem">Logout</a>
+            </div>
+          </div>
+          {% else %}
+          <div class="nav-auth-cta">
+            <a href="{{ url_for('login') }}" class="btn-link">Log in</a>
+            <a href="{{ url_for('signup') }}" class="btn-link btn-link-primary">Sign up</a>
+          </div>
+          {% endif %}
+        </div>
+      </header>
+
+      <main class="page" id="analyzer">
+        <section class="hero">
+          <div class="hero-text">
+            <p class="hero-kicker">Financial NLP &middot; Entity extraction dashboard</p>
+            <h1>Analyze financial news in seconds</h1>
+            <p>
+              Paste any business or markets article to automatically extract
+              <strong>companies</strong>, <strong>currencies</strong>,
+              <strong>tickers</strong>, <strong>economic indicators</strong>,
+              and <strong>financial events</strong>.
+            </p>
+          </div>
+        </section>
+
+        <section class="layout">
+          <div class="panel panel-form">
+            <h2>Input article</h2>
+            <p class="panel-description">
+              Start with the sample text below or replace it with a news
+              paragraph you want to analyze.
+            </p>
+            <form action="{{ url_for('extract') }}#results" method="post" autocomplete="off">
+              <label for="text" class="field-label">Financial news text</label>
+              <textarea
+                id="text"
+                name="text"
+                rows="14"
+                placeholder="Paste or type financial news text here..."
+                autocomplete="off"
+                required
+              >{{ input_text }}</textarea>
+
+              {% if error %}
+              <div class="alert alert-error" role="alert">{{ error }}</div>
+              {% endif %}
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  Extract entities
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="document.getElementById('text').value = '';"
+                >
+                  Clear
+                </button>
+                <p class="hint">
+                  Input is limited to 10,000 characters to keep processing fast.
+                </p>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel panel-visual">
+            <div class="hero-media-card">
+              <p class="hero-media-label">Sample insight</p>
+              <p class="hero-media-title">AAPL earnings call</p>
+              <div class="hero-media-bars">
+                <span class="hero-bar hero-bar-1"></span>
+                <span class="hero-bar hero-bar-2"></span>
+                <span class="hero-bar hero-bar-3"></span>
+              </div>
+            </div>
+            <img
+              src="https://planet-ai.com/wp-content/uploads/2024/06/Blog_2024.07.09_Entity-Extraction.jpg"
+              alt="Illustration of entities extracted from a financial news article"
+              class="hero-image"
+              loading="lazy"
+            />
+          </div>
+        </section>
+
+        <section id="about" class="feature-strip" aria-label="Key features">
+          <div class="feature-pill">
+            <h2>Why this tool?</h2>
+            <p>
+              Quickly highlight the most important financial entities in any
+              business article so you can focus on what moves markets.
+            </p>
+          </div>
+          <div class="feature-pill">
+            <h3>What it detects</h3>
+            <ul>
+              <li>Company names and issuers</li>
+              <li>Currencies and money amounts</li>
+              <li>Stock tickers and macro indicators</li>
+              <li>Financial events like earnings, IPOs, and M&amp;A</li>
+            </ul>
+          </div>
+          <div class="feature-pill">
+            <h3>Best inputs</h3>
+            <p>
+              Try short earnings summaries, central bank statements, or merger
+              announcements for the clearest results.
+            </p>
+          </div>
+        </section>
+
+        <section class="trust-strip" aria-label="Example content types">
+          <p class="trust-label">Designed for modern financial coverage</p>
+          <div class="trust-logos">
+            <span class="trust-chip">Earnings reports</span>
+            <span class="trust-chip">Central bank updates</span>
+            <span class="trust-chip">M&amp;A announcements</span>
+            <span class="trust-chip">Market summaries</span>
+          </div>
+        </section>
+
+        <section class="entity-legend" aria-label="Financial entity legend">
+          <h2 class="entity-legend-title">Financial entity types</h2>
+          <div class="entity-legend-grid">
+            <div class="entity-legend-item">
+              <span class="entity-pill entity-pill-company">Companies</span>
+              <p>Public or private firms mentioned in the article (e.g., Apple, major banks).</p>
+            </div>
+            <div class="entity-legend-item">
+              <span class="entity-pill entity-pill-currency">Currencies / Money</span>
+              <p>Money amounts or currencies like USD, EUR, and large transaction values.</p>
+            </div>
+            <div class="entity-legend-item">
+              <span class="entity-pill entity-pill-ticker">Stock tickers</span>
+              <p>Short symbols such as AAPL or TSLA that identify listed securities.</p>
+            </div>
+            <div class="entity-legend-item">
+              <span class="entity-pill entity-pill-indicator">Economic indicators</span>
+              <p>Macro metrics like GDP, inflation, interest rates, unemployment, or CPI.</p>
+            </div>
+            <div class="entity-legend-item">
+              <span class="entity-pill entity-pill-event">Financial events</span>
+              <p>
+                Corporate or market events such as earnings reports, IPOs, mergers,
+                acquisitions, and funding rounds.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {% if results %}
+        <section class="results" id="results" aria-label="Extraction results">
+          <div class="results-header">
+            <div class="results-header-text">
+              <h2>Extracted entities</h2>
+              <p>Entities are grouped by financial relevance for quick scanning.</p>
+            </div>
+            <div class="results-header-meta">
+              <span class="results-chip">Analysis ready</span>
+            </div>
+          </div>
+
+          <div class="results-summary" aria-label="Entity statistics">
+            <div class="summary-item">
+              <span class="summary-label">Total entities</span>
+              <span class="summary-value">
+                {{
+                  results["companies"]|length
+                  + results["currencies"]|length
+                  + results["stock_tickers"]|length
+                  + results["economic_indicators"]|length
+                  + results["financial_events"]|length
+                  + results["other_entities"]|length
+                }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Companies</span>
+              <span class="summary-value">{{ results["companies"]|length }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Tickers</span>
+              <span class="summary-value">{{ results["stock_tickers"]|length }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Financial events</span>
+              <span class="summary-value">{{ results["financial_events"]|length }}</span>
+            </div>
+          </div>
+
+          <div class="results-grid">
+            {% if results["companies"] %}
+            <div class="card">
+              <h3>Companies</h3>
+              <ul>
+                {% for company in results["companies"] %}
+                <li>{{ company }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            {% if results["currencies"] %}
+            <div class="card">
+              <h3>Currencies / Money</h3>
+              <ul>
+                {% for currency in results["currencies"] %}
+                <li>{{ currency }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            {% if results["stock_tickers"] %}
+            <div class="card">
+              <h3>Stock Tickers</h3>
+              <ul>
+                {% for ticker in results["stock_tickers"] %}
+                <li>{{ ticker }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            {% if results["economic_indicators"] %}
+            <div class="card">
+              <h3>Economic Indicators</h3>
+              <ul>
+                {% for indicator in results["economic_indicators"] %}
+                <li>{{ indicator }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if results["financial_events"] %}
+          <div class="card card-table">
+            <h3>Financial Events</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Event Text</th>
+                  <th>Subtype</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for event in results["financial_events"] %}
+                <tr>
+                  <td>{{ event["text"] }}</td>
+                  <td>{{ event["subtype"] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+
+          {% if results["other_entities"] %}
+          <div class="card card-tags">
+            <h3>Other Detected Entities</h3>
+            <ul class="tag-list">
+              {% for item in results["other_entities"] %}
+              <li class="tag">{{ item }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </section>
+        {% endif %}
+      </main>
+    {% if require_login %}
+    <div class="modal-overlay" id="auth-modal">
+      <div class="modal">
+        <h2>Continue your analysis</h2>
+        <p>
+          You have reached the limit for anonymous use. Create a free account or
+          log in to keep analyzing financial news.
+        </p>
+        <div class="modal-actions">
+          <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign up</a>
+          <a href="{{ url_for('login') }}" class="btn btn-secondary">Log in</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <script>
+      (function () {
+        try {
+          var entries =
+            performance.getEntriesByType &&
+            performance.getEntriesByType('navigation');
+          var navType = entries && entries.length
+            ? entries[0].type
+            : (performance.navigation || {}).type;
+          var isReload = navType === 'reload' || navType === 1; // 1 == TYPE_RELOAD in older APIs
+          if (!isReload) return;
+
+          var textarea = document.getElementById('text');
+          if (textarea) {
+            textarea.value = '';
+          }
+
+          var resultsSection = document.getElementById('results');
+          if (resultsSection) {
+            resultsSection.style.display = 'none';
+          }
+        } catch (e) {
+          // fail silently; clearing is just a UX enhancement
+        }
+      })();
+
+      // Simple profile dropdown
+      (function () {
+        var trigger = document.getElementById('profile-menu');
+        if (!trigger) return;
+        var button = trigger.querySelector('.profile-trigger');
+        var dropdown = document.getElementById('profile-dropdown');
+        if (!button || !dropdown) return;
+
+        function closeMenu() {
+          dropdown.classList.remove('open');
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        button.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var isOpen = dropdown.classList.contains('open');
+          if (isOpen) {
+            closeMenu();
+          } else {
+            dropdown.classList.add('open');
+            button.setAttribute('aria-expanded', 'true');
+          }
+        });
+
+        document.addEventListener('click', function () {
+          closeMenu();
+        });
+      })();
+
+      // Auto-focus input when auth modal is showing is handled on the login/signup pages.
+    </script>
+  </body>
+</html>

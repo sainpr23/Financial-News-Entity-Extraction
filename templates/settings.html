@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings · Financial News Entity Extraction</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-nav">
+        <div class="brand">
+          <div class="brand-mark">FN</div>
+          <div class="brand-text">
+            <span class="brand-title">Financial News Entity Extraction</span>
+            <span class="brand-subtitle">Account settings</span>
+          </div>
+        </div>
+        <div class="nav-right">
+          <a href="{{ url_for('index') }}" class="btn-link">Back to analyzer</a>
+          <a href="{{ url_for('logout') }}" class="btn-link">Logout</a>
+        </div>
+      </header>
+
+      <main class="page">
+        <section class="layout">
+          <div class="panel panel-form">
+            <h2>Account</h2>
+            <p class="panel-description">
+              You are logged in as <strong>{{ user }}</strong>.
+            </p>
+            <p class="hint">
+              For this project, settings are minimal. In a real deployment, this
+              page could let you change your password, email, or notification
+              preferences.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

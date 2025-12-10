@@ -1,0 +1,4 @@
+flask
+spacy
+pandas
+numpy

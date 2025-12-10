@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign up &middot; Financial News Entity Extraction</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="auth-page">
+      <div class="auth-visual">
+        <div class="auth-visual-inner">
+          <div class="brand auth-brand">
+            <div class="brand-mark">FN</div>
+            <div class="brand-text">
+              <span class="brand-title">Financial News Entity Extraction</span>
+            </div>
+          </div>
+          <h1 class="auth-heading">Welcome to the platform</h1>
+          <p class="auth-subtext">
+            Create an account to save your usage and run more detailed entity extraction on financial news.
+          </p>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        <div class="auth-card">
+          <div class="auth-card-header">
+            <h2 class="auth-card-title">Create your account</h2>
+            <a href="{{ url_for('index') }}" class="auth-back-link">&larr; Back to analyzer</a>
+          </div>
+
+          {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+          {% for category, msg in messages %}
+          <div class="alert alert-error" role="alert">{{ msg }}</div>
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+
+          <form action="{{ url_for('signup') }}" method="post" class="auth-form">
+            <label for="username" class="field-label">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              minlength="3"
+              maxlength="50"
+              class="text-input"
+              autocomplete="username"
+              autofocus
+            />
+
+            <label for="email" class="field-label">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              class="text-input"
+              autocomplete="email"
+            />
+
+            <label for="password" class="field-label">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              minlength="6"
+              maxlength="128"
+              class="text-input"
+              autocomplete="new-password"
+            />
+
+            <div class="form-actions auth-form-actions">
+              <button type="submit" class="btn btn-primary">Sign up</button>
+              <p class="hint">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Log in</a>.
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
